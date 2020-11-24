@@ -86,6 +86,8 @@ func main() {
 	cfg.QPS = 2 * float32(*qps)
 	cfg.Burst = 2 * *burst
 
+	log.Printf("config APIPath: %s", cfg.APIPath)
+
 	ctx := injection.WithNamespaceScope(signals.NewContext(), *namespace)
 	if *disableHighAvailability {
 		ctx = sharedmain.WithHADisabled(ctx)
