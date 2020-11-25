@@ -1,27 +1,26 @@
-# Start from the latest golang base image
-FROM golang
+FROM golang AS builder
 
-# Add Maintainer Info
-LABEL maintainer="Yang Lei <leiyanggz@gmail.com>"
+# enable Go modules support
+ENV GO111MODULE=on
 
-# Set the Current Working Directory inside the container
-WORKDIR /app
+WORKDIR $GOPATH/src/github.com/tekton/pipeline
 
-# Copy go mod and sum files
-COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# manage dependencies
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
-COPY . .
+# Copy src code from the host and compile it
+COPY cmd cmd
+COPY pkg pkg
+COPY vendor vendor
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o /pipeline cmd/controller/main.go
 
-WORKDIR /app/cmd/controller
-
-RUN go build -o main .
+FROM alpine:3.9
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /pipeline /bin
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["./main"]
+ENTRYPOINT ["/bin/pipeline"]

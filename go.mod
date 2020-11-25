@@ -1,4 +1,4 @@
-module github.com/tektoncd/pipeline
+module github.com/leiyanggz/pipeline
 
 go 1.13
 
@@ -13,12 +13,13 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
+	github.com/tektoncd/pipeline v0.18.1 // indirect
 	go.opencensus.io v0.22.5
 	go.uber.org/zap v1.16.0
 	gomodules.xyz/jsonpatch/v2 v2.1.0
 	k8s.io/api v0.18.12
-	k8s.io/apimachinery v0.18.12
-	k8s.io/client-go v0.18.12
+	k8s.io/apimachinery v0.19.0
+	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29
 	knative.dev/pkg v0.0.0-20201124182335-e1306afeada7
 )

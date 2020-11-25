@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -87,6 +88,7 @@ func main() {
 	cfg.Burst = 2 * *burst
 
 	log.Printf("config %+v\n", cfg)
+	fmt.Printf("config %+v\n", cfg)
 
 	ctx := injection.WithNamespaceScope(signals.NewContext(), *namespace)
 	if *disableHighAvailability {
