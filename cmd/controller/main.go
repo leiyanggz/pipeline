@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -59,6 +58,8 @@ var (
 	disableHighAvailability  = flag.Bool("disable-ha", false, "Whether to disable high-availability functionality for this component.  This flag will be deprecated "+
 		"and removed when we have promoted this feature to stable, so do not pass it without filing an "+
 		"issue upstream!")
+	kubeconfig 				 = flag.String("kubeconfig", "","Path to a kubeconfig. Only required if out-of-cluster.")
+	clusterKubeconfig 		 = flag.String("cluster-kubeconfig", "","Path to a cluster kubeconfig. Only required if out-of-cluster.")
 )
 
 func main() {
@@ -82,13 +83,23 @@ func main() {
 
 	controller.DefaultThreadsPerController = *threadsPerController
 
-	cfg := sharedmain.ParseAndGetConfigOrDie()
+	cfg, err := sharedmain.GetConfig("", *kubeconfig)
+	if err != nil {
+		log.Fatalf("Error building kubeconfig: %v", err)
+	}
+
+	//cfg := sharedmain.ParseAndGetConfigOrDie()
 	// multiply by 2, no of controllers being created
 	cfg.QPS = 2 * float32(*qps)
 	cfg.Burst = 2 * *burst
 
 	log.Printf("config %+v\n", cfg)
-	fmt.Printf("config %+v\n", cfg)
+
+	clusterCfg, err := sharedmain.GetConfig("", *clusterKubeconfig)
+	if err != nil {
+		log.Fatalf("Error building clusterKubeconfig: %v", err)
+	}
+	log.Printf("clusterKubeconfig %+v\n", clusterCfg)
 
 	ctx := injection.WithNamespaceScope(signals.NewContext(), *namespace)
 	if *disableHighAvailability {

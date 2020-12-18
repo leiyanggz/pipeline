@@ -18,6 +18,7 @@ package main
 
 import (
 	"context"
+	//"flag"
 	"log"
 	"net/http"
 	"os"
@@ -43,6 +44,10 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics/conversion"
 	"knative.dev/pkg/webhook/resourcesemantics/defaulting"
 	"knative.dev/pkg/webhook/resourcesemantics/validation"
+)
+
+var (
+	//kubeconfig = flag.String("kubeconfig", "","Path to a kubeconfig. Only required if out-of-cluster.")
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
@@ -195,6 +200,7 @@ func newConversionController(ctx context.Context, cmw configmap.Watcher) *contro
 }
 
 func main() {
+	//flag.Parse()
 	serviceName := os.Getenv("WEBHOOK_SERVICE_NAME")
 	if serviceName == "" {
 		serviceName = "tekton-pipelines-webhook"
@@ -235,8 +241,12 @@ func main() {
 	// NOTE(afrittoli) - we should have the name "webhook-pipeline"
 	// configurable. Once the change is done on knative/pkg side
 	// knative/eventing#4530 we can inherit it from it
+
+	cfg := sharedmain.ParseAndGetConfigOrDie()
+	log.Printf("config %+v\n", cfg)
+
 	sharedmain.WebhookMainWithConfig(ctx, "webhook-pipeline",
-		sharedmain.ParseAndGetConfigOrDie(),
+		cfg,
 		certificates.NewController,
 		newDefaultingAdmissionController,
 		newValidationAdmissionController,
